@@ -1,0 +1,59 @@
+groups:
+  - name: video-stream-processor-alerts
+    rules:
+      - alert: HighUploadFailures
+        expr: increase(vsp_upload_failures_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High upload failure rate detected"
+          description: "There have been upload failures in the last 5 minutes."
+      - alert: HighRedisErrors
+        expr: increase(vsp_redis_errors_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Redis error rate detected"
+          description: "There have been Redis errors in the last 5 minutes."
+      - alert: NoFilesDetected
+        expr: increase(vsp_files_detected_total[10m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No files detected for processing"
+          description: "No new video files have been detected in the last 10 minutes."
+      - alert: FilesStuckInProgress
+        expr: vsp_files_in_progress > 0
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Files stuck in processing"
+          description: "One or more files have been in progress for over 15 minutes."
+      - alert: SlowFileProcessing
+        expr: histogram_quantile(0.95, rate(vsp_file_processing_duration_seconds_bucket[10m])) > 120
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "File processing is slow"
+          description: "95th percentile file processing duration exceeds 2 minutes."
+      - alert: SlowChunkUpload
+        expr: histogram_quantile(0.95, rate(vsp_chunk_upload_duration_seconds_bucket[10m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Chunk upload is slow"
+          description: "95th percentile chunk upload duration exceeds 10 seconds."
+      - alert: NoRecentFileProcessed
+        expr: time() - vsp_last_file_processed_unixtime > 1800
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No file processed recently"
+          description: "No file has been successfully processed in the last 30 minutes."
