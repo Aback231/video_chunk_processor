@@ -14,10 +14,6 @@ A production-ready, horizontally scalable video stream file processor in Go. Fea
 - Test coverage: 65.3% (see coverage report for details)
 - All configuration via `.env`
 
-## Architecture
-
-![Architecture Diagram](deploy/architecture.png)
-
 ## Usage
 
 ### 1. Configuration
